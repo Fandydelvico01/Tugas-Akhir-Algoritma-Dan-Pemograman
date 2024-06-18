@@ -1,0 +1,95 @@
+# Dictionary untuk menyimpan data pengguna ATM (PIN sebagai key dan saldo sebagai value)
+database = {
+    '123456': 5000000,  # Contoh PIN dan saldo
+    '654321': 3000000,  # Contoh PIN dan saldo
+    # Tambahkan data pengguna ATM lainnya sesuai kebutuhan
+}
+
+# Fungsi untuk login
+def login():
+    pin = input("Masukkan PIN Anda: ")
+    if pin in database:
+        return pin
+    else:
+        print("PIN salah.")
+        return None
+
+# Fungsi untuk menampilkan menu ATM
+def menu_atm(pin):
+    while True:
+        print("\n=== ATM Menu ===")
+        print("1. Cek Saldo")
+        print("2. Tarik Tunai")
+        print("3. Setor Tunai")
+        print("4. Transfer")
+        print("5. Keluar")
+        pilihan = input("Pilih menu (1/2/3/4/5): ")
+
+        if pilihan == '1':
+            cek_saldo(pin)
+        elif pilihan == '2':
+            tarik_tunai(pin)
+        elif pilihan == '3':
+            setor_tunai(pin)
+        elif pilihan == '4':
+            transfer(pin)
+        elif pilihan == '5':
+            print("Terima kasih telah menggunakan layanan ATM.")
+            break
+        else:
+            print("Pilihan tidak valid, silakan coba lagi.")
+
+# Fungsi untuk mengecek saldo
+def cek_saldo(pin):
+    saldo = database[pin]
+    print(f"Saldo Anda saat ini adalah Rp {saldo:,}")
+
+# Fungsi untuk melakukan penarikan tunai
+def tarik_tunai(pin):
+    saldo = database[pin]
+    nominal = int(input("Masukkan jumlah uang yang ingin ditarik (kelipatan Rp 50.000): "))
+    if nominal % 50000 != 0:
+        print("Nominal harus dalam kelipatan Rp 50.000.")
+    elif nominal > saldo:
+        print("Saldo Anda tidak mencukupi.")
+    else:
+        database[pin] -= nominal
+        print(f"Anda telah menarik Rp {nominal:,}.")
+        cek_saldo(pin)
+
+# Fungsi untuk melakukan setor tunai
+def setor_tunai(pin):
+    nominal = int(input("Masukkan jumlah uang yang ingin disetor: "))
+    if nominal > 0:
+        database[pin] += nominal
+        print(f"Anda telah melakukan setor tunai sebesar Rp {nominal:,}.")
+        cek_saldo(pin)
+    else:
+        print("Nominal harus lebih dari 0.")
+
+# Fungsi untuk melakukan transfer saldo
+def transfer(pin):
+    tujuan = input("Masukkan PIN penerima transfer: ")
+    if tujuan in database:
+        nominal = int(input("Masukkan jumlah uang yang ingin ditransfer: "))
+        if nominal > 0 and nominal <= database[pin]:
+            database[pin] -= nominal
+            database[tujuan] += nominal
+            print(f"Transfer sebesar Rp {nominal:,} berhasil dilakukan ke {tujuan}.")
+            cek_saldo(pin)
+        elif nominal <= 0:
+            print("Nominal transfer harus lebih dari 0.")
+        else:
+            print("Saldo Anda tidak mencukupi untuk melakukan transfer sebesar itu.")
+    else:
+        print("PIN penerima transfer tidak ditemukan.")
+
+# Main program
+def main():
+    print("Selamat datang di ATM.")
+    pin = login()
+    if pin:
+        menu_atm(pin)
+
+if __name__ == "__main__":
+    main()
